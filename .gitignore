@@ -1,0 +1,14 @@
+# Dependencias
+node_modules/
+
+# Configuración con contraseñas y claves (nunca se sube)
+.env
+
+# Archivos generados al compilar el frontend
+dist/
+build/
+
+# Archivos del sistema y del editor
+.DS_Store
+Thumbs.db
+.vscode/

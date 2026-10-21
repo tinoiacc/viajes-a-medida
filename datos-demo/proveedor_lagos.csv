@@ -1,0 +1,11 @@
+tipo,destino,servicio,categoria,tarifa_neta,moneda,base,vigencia_desde,vigencia_hasta
+Alojamiento,San Carlos de Bariloche,Posada del Río,3,169400.00,ARS,2,2026-11-01,2027-03-31
+Alojamiento,San Carlos de Bariloche,Hotel Mirador del Lago,5,400400.00,ARS,2,2026-11-01,2027-03-31
+Traslado,San Carlos de Bariloche,Transfer aeropuerto in/out,,52360.00,ARS,1,2026-11-01,2027-03-31
+Excursión,San Carlos de Bariloche,Circuito Chico,,50820.00,ARS,1,2026-11-01,2027-03-31
+Excursión,San Carlos de Bariloche,Cerro Catedral con aerosilla,,84700.00,ARS,1,2026-11-01,2027-03-31
+Alojamiento,San Martín de los Andes,Hotel Cumbres Andinas,4,261800.00,ARS,2,2026-11-01,2027-03-31
+Adicional,San Martín de los Andes,Asistencia al viajero nacional (por persona),,30800.00,ARS,1,2026-11-01,2027-03-31
+Alojamiento,San Carlos de Bariloche,Hotel Sin Precio,3,-50000.00,ARS,2,2026-11-01,2027-03-31
+Excursión,San Carlos de Bariloche,Paseo Lacustre,,61600.00,ARS,1,2027-03-31,2026-11-01
+Excursión,Ushuaia,Tren del Fin del Mundo,,90000.00,ARS,1,2026-11-01,2027-03-31

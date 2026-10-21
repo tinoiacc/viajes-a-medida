@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Proveedor {
+  id              Int        @id @default(autoincrement())
+  nombre          String     @db.VarChar(100)
+  monedaOperacion String     @map("moneda_operacion") @db.VarChar(3)
+  servicios       Servicio[]
+  paquetes        Paquete[]
+
+  @@map("proveedor")
+}
+
+model Destino {
+  id                  Int                 @id @default(autoincrement())
+  nombre              String              @db.VarChar(100)
+  provincia           String              @db.VarChar(100)
+  pais                String              @db.VarChar(100)
+  servicios           Servicio[]
+  destinosSolicitados DestinoSolicitado[]
+
+  @@map("destino")
+}
+
+model Usuario {
+  id             Int         @id @default(autoincrement())
+  nombre         String      @db.VarChar(100)
+  email          String      @unique @db.VarChar(150)
+  hashContrasena String      @map("hash_contrasena") @db.VarChar(100)
+  rol            String      @db.VarChar(20)
+  solicitudes    Solicitud[]
+
+  @@map("usuario")
+}
+
+model ParametroComercial {
+  id              Int       @id @default(autoincrement())
+  concepto        String    @db.VarChar(15)  // Margen | Comision | Tasa | Impuesto
+  aplicaA         String    @map("aplica_a") @db.VarChar(20) // Alojamiento | Traslado | Excursion | Todos
+  valorPorcentual Decimal   @map("valor_porcentual") @db.Decimal(5, 2)
+  vigenciaDesde   DateTime  @map("vigencia_desde") @db.Date
+  vigenciaHasta   DateTime? @map("vigencia_hasta") @db.Date
+
+  @@map("parametro_comercial")
+}
+
+model Servicio {
+  id              Int               @id @default(autoincrement())
+  idProveedor     Int               @map("id_proveedor")
+  idDestino       Int               @map("id_destino")
+  tipo            String            @db.VarChar(15) // Alojamiento | Traslado | Excursion
+  nombre          String            @db.VarChar(150)
+  categoria       String?           @db.VarChar(10)
+  proveedor       Proveedor         @relation(fields: [idProveedor], references: [id])
+  destino         Destino           @relation(fields: [idDestino], references: [id])
+  tarifas         Tarifa[]
+  paquetes        PaqueteServicio[]
+  opcionServicios OpcionServicio[]
+
+  @@map("servicio")
+}
+
+model Paquete {
+  id             Int               @id @default(autoincrement())
+  idProveedor    Int               @map("id_proveedor")
+  nombre         String            @db.VarChar(150)
+  fechaSalida    DateTime          @map("fecha_salida") @db.Date
+  fechaRegreso   DateTime          @map("fecha_regreso") @db.Date
+  cupoDisponible Int               @map("cupo_disponible")
+  precioGlobal   Decimal           @map("precio_global") @db.Decimal(12, 2)
+  moneda         String            @db.VarChar(3)
+  proveedor      Proveedor         @relation(fields: [idProveedor], references: [id])
+  servicios      PaqueteServicio[]
+  opciones       Opcion[]
+
+  @@map("paquete")
+}
+
+model PaqueteServicio {
+  idPaquete  Int      @map("id_paquete")
+  idServicio Int      @map("id_servicio")
+  paquete    Paquete  @relation(fields: [idPaquete], references: [id])
+  servicio   Servicio @relation(fields: [idServicio], references: [id])
+
+  @@id([idPaquete, idServicio])
+  @@map("paquete_servicio")
+}
+
+model Tarifa {
+  id              Int              @id @default(autoincrement())
+  idServicio      Int              @map("id_servicio")
+  montoNeto       Decimal          @map("monto_neto") @db.Decimal(12, 2)
+  moneda          String           @db.VarChar(3)
+  baseOcupacion   Int              @map("base_ocupacion")
+  vigenciaDesde   DateTime         @map("vigencia_desde") @db.Date
+  vigenciaHasta   DateTime         @map("vigencia_hasta") @db.Date
+  servicio        Servicio         @relation(fields: [idServicio], references: [id])
+  opcionServicios OpcionServicio[]
+
+  @@map("tarifa")
+}
+
+model Solicitud {
+  id                     Int                 @id @default(autoincrement())
+  idUsuario              Int?                @map("id_usuario")
+  codigoSeguimiento      String              @unique @map("codigo_seguimiento") @db.VarChar(9)
+  nombreCliente          String              @map("nombre_cliente") @db.VarChar(100)
+  apellidoCliente        String              @map("apellido_cliente") @db.VarChar(100)
+  email                  String              @db.VarChar(150)
+  cantidadAdultos        Int                 @map("cantidad_adultos")
+  cantidadMenores        Int                 @default(0) @map("cantidad_menores")
+  fechaIngreso           DateTime            @default(now()) @map("fecha_ingreso")
+  presupuestoMax         Decimal             @map("presupuesto_max") @db.Decimal(12, 2)
+  prioridadPrecioConfort Int                 @default(3) @map("prioridad_precio_confort")
+  prioridadRitmo         Int                 @default(3) @map("prioridad_ritmo")
+  estado                 String              @default("RECIBIDA") @db.VarChar(20)
+  fechaUltimoCambio      DateTime            @default(now()) @map("fecha_ultimo_cambio")
+  usuario                Usuario?            @relation(fields: [idUsuario], references: [id])
+  destinos               DestinoSolicitado[]
+  opciones               Opcion[]
+
+  @@map("solicitud")
+}
+
+model DestinoSolicitado {
+  id          Int       @id @default(autoincrement())
+  idSolicitud Int       @map("id_solicitud")
+  idDestino   Int       @map("id_destino")
+  fechaDesde  DateTime  @map("fecha_desde") @db.Date
+  fechaHasta  DateTime  @map("fecha_hasta") @db.Date
+  solicitud   Solicitud @relation(fields: [idSolicitud], references: [id], onDelete: Cascade)
+  destino     Destino   @relation(fields: [idDestino], references: [id])
+
+  @@map("destino_solicitado")
+}
+
+model Opcion {
+  id             Int              @id @default(autoincrement())
+  idSolicitud    Int              @map("id_solicitud")
+  idPaquete      Int?             @map("id_paquete")
+  origen         String           @default("Armada") @db.VarChar(10)
+  costoNetoTotal Decimal          @map("costo_neto_total") @db.Decimal(12, 2)
+  margenAplicado Decimal          @map("margen_aplicado") @db.Decimal(12, 2)
+  importeAereo   Decimal          @default(0) @map("importe_aereo") @db.Decimal(12, 2)
+  precioFinal    Decimal          @map("precio_final") @db.Decimal(12, 2)
+  moneda         String           @default("USD") @db.VarChar(3)
+  orden          Int
+  descartada     Boolean          @default(false)
+  solicitud      Solicitud        @relation(fields: [idSolicitud], references: [id], onDelete: Cascade)
+  paquete        Paquete?         @relation(fields: [idPaquete], references: [id])
+  servicios      OpcionServicio[]
+
+  @@map("opcion")
+}
+
+model OpcionServicio {
+  id         Int      @id @default(autoincrement())
+  idOpcion   Int      @map("id_opcion")
+  idServicio Int      @map("id_servicio")
+  idTarifa   Int      @map("id_tarifa")
+  fechaDesde DateTime @map("fecha_desde") @db.Date
+  fechaHasta DateTime @map("fecha_hasta") @db.Date
+  cantidad   Int
+  opcion     Opcion   @relation(fields: [idOpcion], references: [id], onDelete: Cascade)
+  servicio   Servicio @relation(fields: [idServicio], references: [id])
+  tarifa     Tarifa   @relation(fields: [idTarifa], references: [id])
+
+  @@map("opcion_servicio")
+}
