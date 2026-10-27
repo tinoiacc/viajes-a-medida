@@ -5,19 +5,13 @@ import { prisma } from '../src/lib/prisma.js';
 import { importarCatalogo } from '../src/modulos/catalogo/etl.js';
 
 async function limpiar() {
-  // Orden inverso a las claves foráneas
-  await prisma.opcionServicio.deleteMany();
-  await prisma.opcion.deleteMany();
-  await prisma.destinoSolicitado.deleteMany();
-  await prisma.solicitud.deleteMany();
-  await prisma.paqueteServicio.deleteMany();
-  await prisma.paquete.deleteMany();
-  await prisma.tarifa.deleteMany();
-  await prisma.servicio.deleteMany();
-  await prisma.proveedor.deleteMany();
-  await prisma.destino.deleteMany();
-  await prisma.parametroComercial.deleteMany();
-  await prisma.usuario.deleteMany();
+  // Vacía todas las tablas y reinicia los contadores de ID
+  await prisma.$executeRawUnsafe(`
+    TRUNCATE TABLE opcion_servicio, opcion, destino_solicitado, solicitud,
+      paquete_servicio, paquete, tarifa, servicio, proveedor, destino,
+      parametro_comercial, usuario
+    RESTART IDENTITY CASCADE
+  `);
 }
 
 async function main() {

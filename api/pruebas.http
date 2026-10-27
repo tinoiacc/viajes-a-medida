@@ -1,0 +1,148 @@
+@api = http://localhost:3000/api
+
+### Salud del servidor
+GET {{api}}/salud
+
+### Destinos disponibles
+GET {{api}}/destinos
+
+################ HU-07: LOGIN ################
+
+### Crit. 1: credenciales correctas → token
+# @name login
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "agente@demo.com", "contrasena": "Agente#2026" }
+
+### Crit. 2: credenciales incorrectas → 401
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "agente@demo.com", "contrasena": "otra" }
+
+### Ruta protegida sin token → 401
+GET {{api}}/proveedores
+
+################ HU-08: CATÁLOGO ################
+
+### Proveedores
+GET {{api}}/proveedores
+Authorization: Bearer {{login.response.body.token}}
+
+### Autocompletado: servicios de Andes (1) en Bariloche (1)
+GET {{api}}/servicios?idProveedor=1&idDestino=1
+Authorization: Bearer {{login.response.body.token}}
+
+### Carga manual: tarifa de otra temporada para un hotel existente → servicioNuevo: false
+POST {{api}}/servicios
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "idProveedor": 1, "idDestino": 1,
+  "tipo": "Alojamiento", "nombre": "Hotel Altos del Valle", "categoria": "4",
+  "montoNeto": 175, "moneda": "USD", "baseOcupacion": 2,
+  "vigenciaDesde": "2027-04-01", "vigenciaHasta": "2027-06-30"
+}
+
+### Carga manual: servicio nuevo → servicioNuevo: true
+POST {{api}}/servicios
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "idProveedor": 1, "idDestino": 1,
+  "tipo": "Excursion", "nombre": "Cerro Otto con teleférico",
+  "montoNeto": 40, "moneda": "USD", "baseOcupacion": 1,
+  "vigenciaDesde": "2026-11-01", "vigenciaHasta": "2027-03-31"
+}
+
+### Carga manual inválida: tarifa negativa y vigencia invertida → 400
+POST {{api}}/servicios
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "idProveedor": 1, "idDestino": 1,
+  "tipo": "Excursion", "nombre": "Prueba",
+  "montoNeto": -10, "moneda": "USD", "baseOcupacion": 1,
+  "vigenciaDesde": "2027-03-31", "vigenciaHasta": "2026-11-01"
+}
+
+### Importación con la plantilla estándar: 1 fila válida y 1 inválida
+POST {{api}}/servicios/importar
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "idProveedor": 2,
+  "contenido": "tipo,destino,servicio,categoria,tarifa_neta,moneda,base,vigencia_desde,vigencia_hasta\nExcursion,San Carlos de Bariloche,Navegación a Puerto Blest,,92400.00,ARS,1,2026-11-01,2027-03-31\nExcursion,San Carlos de Bariloche,Sin fecha,,1000.00,ARS,1,,2027-03-31"
+}
+
+################ HU-01, 02, 03: SOLICITUDES ################
+
+### Solicitud válida → 201 con código y estado RECIBIDA
+POST {{api}}/solicitudes
+Content-Type: application/json
+
+{
+  "nombreCliente": "Martín",
+  "apellidoCliente": "Gómez",
+  "email": "martin.gomez@ejemplo.com",
+  "cantidadAdultos": 2,
+  "presupuestoMax": 2500,
+  "prioridadPrecioConfort": 4,
+  "prioridadRitmo": 2,
+  "consentimientoDatos": true,
+  "destinos": [
+    { "idDestino": 1, "fechaDesde": "2026-12-12", "fechaHasta": "2026-12-19" }
+  ]
+}
+
+### HU-02 crit. 2: sin prioridades → se guardan en 3 por defecto
+POST {{api}}/solicitudes
+Content-Type: application/json
+
+{
+  "nombreCliente": "Laura",
+  "apellidoCliente": "Pérez",
+  "email": "laura@ejemplo.com",
+  "cantidadAdultos": 1,
+  "presupuestoMax": 1800,
+  "consentimientoDatos": true,
+  "destinos": [
+    { "idDestino": 2, "fechaDesde": "2027-01-10", "fechaHasta": "2027-01-15" }
+  ]
+}
+
+### HU-01 crit. 1 y 2: falta el nombre y la fecha de regreso es anterior → 400
+POST {{api}}/solicitudes
+Content-Type: application/json
+
+{
+  "apellidoCliente": "Gómez",
+  "email": "martin.gomez@ejemplo.com",
+  "cantidadAdultos": 2,
+  "presupuestoMax": 2500,
+  "consentimientoDatos": true,
+  "destinos": [
+    { "idDestino": 1, "fechaDesde": "2026-12-19", "fechaHasta": "2026-12-12" }
+  ]
+}
+
+### Sin consentimiento de datos → 400
+POST {{api}}/solicitudes
+Content-Type: application/json
+
+{
+  "nombreCliente": "Martín",
+  "apellidoCliente": "Gómez",
+  "email": "martin.gomez@ejemplo.com",
+  "cantidadAdultos": 2,
+  "presupuestoMax": 2500,
+  "consentimientoDatos": false,
+  "destinos": [
+    { "idDestino": 1, "fechaDesde": "2026-12-12", "fechaHasta": "2026-12-19" }
+  ]
+}
