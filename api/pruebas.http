@@ -272,3 +272,114 @@ POST {{api}}/seguimiento
 Content-Type: application/json
 
 { "codigo": "{{sofia.response.body.codigoSeguimiento}}", "apellido": "Ramírez" }
+
+################ SESIÓN 4 ################
+# Antes: login, "Solicitud 1 (Sofía)" ya ejecutada, y node prisma/opcionDePrueba.js
+
+### HU-12 crit. 1 y 3: detalle con el desglose del precio
+GET {{api}}/panel/solicitudes/1
+Authorization: Bearer {{login.response.body.token}}
+
+### HU-13 crit. 1: cargar el aéreo (USD 730) → el precio final sube
+PATCH {{api}}/panel/opciones/1/aereo
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "importe": 730 }
+
+### Aéreo negativo → 400
+PATCH {{api}}/panel/opciones/1/aereo
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "importe": -50 }
+
+### Alternativas para reemplazar el hotel (línea 1)
+GET {{api}}/panel/opciones/1/servicios/1/alternativas
+Authorization: Bearer {{login.response.body.token}}
+
+### HU-14 crit. 1 y HU-12 crit. 2: reemplazar el hotel por Posada del Río (en pesos) → recalcula
+PATCH {{api}}/panel/opciones/1/servicios/1
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "idServicio": 12 }
+
+### Reemplazar el hotel por una excursión → 409
+PATCH {{api}}/panel/opciones/1/servicios/1
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "idServicio": 4 }
+
+### Agregar la asistencia al viajero para 2 personas → recalcula
+POST {{api}}/panel/opciones/1/servicios
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "idServicio": 11, "cantidad": 2 }
+
+### Agregar un servicio de otro destino (San Martín) → 409
+POST {{api}}/panel/opciones/1/servicios
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "idServicio": 18, "cantidad": 2 }
+
+### Quitar el alojamiento → 409
+DELETE {{api}}/panel/opciones/1/servicios/1
+Authorization: Bearer {{login.response.body.token}}
+
+### HU-14 crit. 2: descartar la opción
+PATCH {{api}}/panel/opciones/1/descartar
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "descartada": true }
+
+### Validar con la única opción descartada → 409
+PATCH {{api}}/panel/solicitudes/1/estado
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "estado": "PROPUESTA_ENVIADA" }
+
+### Recuperar la opción
+PATCH {{api}}/panel/opciones/1/descartar
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "descartada": false }
+
+### HU-14 crit. 3: validar la propuesta → 200 y aviso por correo
+PATCH {{api}}/panel/solicitudes/1/estado
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "estado": "PROPUESTA_ENVIADA" }
+
+### HU-05 crit. 1 y 3: el cliente ve la opción con su precio y servicios (sin costos)
+POST {{api}}/seguimiento
+Content-Type: application/json
+
+{ "codigo": "{{sofia.response.body.codigoSeguimiento}}", "apellido": "Ramírez" }
+
+### Modificar una propuesta ya enviada → 409
+PATCH {{api}}/panel/opciones/1/aereo
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "importe": 500 }
+
+// NUEVO - Sesion 4 !!
+
+### Detalle de la solicitud 1 (para tomar su código)
+# @name solicitud1
+GET {{api}}/panel/solicitudes/1
+Authorization: Bearer {{login.response.body.token}}
+
+### HU-05 crit. 1 y 3: el cliente de la solicitud 1 ve su opción
+POST {{api}}/seguimiento
+Content-Type: application/json
+
+{ "codigo": "{{solicitud1.response.body.codigoSeguimiento}}", "apellido": "Ramírez" }
