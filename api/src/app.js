@@ -4,6 +4,8 @@ import { rutasAuth } from './modulos/auth/auth.rutas.js';
 import { rutasSolicitudes } from './modulos/solicitudes/solicitudes.rutas.js';
 import { rutasCatalogo } from './modulos/catalogo/catalogo.rutas.js';
 import { manejarErrores } from './middlewares/errores.js';
+import { rutasSeguimiento } from './modulos/seguimiento/seguimiento.rutas.js';
+import { rutasPanel } from './modulos/panel/panel.rutas.js';
 
 export const app = express();
 
@@ -14,5 +16,8 @@ app.get('/api/salud', (req, res) => res.json({ estado: 'ok' }));
 app.use('/api/auth', rutasAuth);
 app.use('/api/solicitudes', rutasSolicitudes);
 app.use('/api', rutasCatalogo);
+
+app.use('/api/seguimiento', rutasSeguimiento);
+app.use('/api/panel', rutasPanel);
 
 app.use(manejarErrores); // siempre al final

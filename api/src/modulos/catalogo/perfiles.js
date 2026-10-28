@@ -2,8 +2,8 @@
 // transformar cada fila al formato común del catálogo.
 // Los proveedores sin perfil propio usan el FORMATO_ESTANDAR.
 
-export const normalizar = (t) =>
-  (t ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+import { normalizar } from '../../lib/formato.js';
+export { normalizar };
 
 const vacioANull = (t) => (t && t.trim() !== '' ? t.trim() : null);
 

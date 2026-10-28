@@ -146,3 +146,129 @@ Content-Type: application/json
     { "idDestino": 1, "fechaDesde": "2026-12-12", "fechaHasta": "2026-12-19" }
   ]
 }
+
+################ SESIÓN 3 ################
+# Antes: npx prisma db seed y ejecutar el login
+
+### Solicitud 1 (Sofía Ramírez): queda RECIBIDA
+# @name sofia
+POST {{api}}/solicitudes
+Content-Type: application/json
+
+{
+  "nombreCliente": "Sofía",
+  "apellidoCliente": "Ramírez",
+  "email": "sofia.ramirez@ejemplo.com",
+  "cantidadAdultos": 2,
+  "presupuestoMax": 2500,
+  "prioridadPrecioConfort": 4,
+  "prioridadRitmo": 2,
+  "consentimientoDatos": true,
+  "destinos": [
+    { "idDestino": 1, "fechaDesde": "2026-12-12", "fechaHasta": "2026-12-19" }
+  ]
+}
+
+### Solicitud 2 (Laura Pérez): queda RECIBIDA
+POST {{api}}/solicitudes
+Content-Type: application/json
+
+{
+  "nombreCliente": "Laura",
+  "apellidoCliente": "Pérez",
+  "email": "laura@ejemplo.com",
+  "cantidadAdultos": 1,
+  "presupuestoMax": 1800,
+  "consentimientoDatos": true,
+  "destinos": [
+    { "idDestino": 2, "fechaDesde": "2027-01-10", "fechaHasta": "2027-01-15" }
+  ]
+}
+
+################ HU-04, 05, 06: ACCESO DEL CLIENTE ################
+
+### HU-04 crit. 1: código y apellido correctos → 200 (sin tilde ni mayúsculas también funciona)
+POST {{api}}/seguimiento
+Content-Type: application/json
+
+{ "codigo": "{{sofia.response.body.codigoSeguimiento}}", "apellido": "ramirez" }
+
+### HU-04 crit. 2 y 3: apellido incorrecto → 401. Ejecutalo 4 veces: la 4.ª da 429
+POST {{api}}/seguimiento
+Content-Type: application/json
+
+{ "codigo": "{{sofia.response.body.codigoSeguimiento}}", "apellido": "Gómez" }
+
+### Código con formato inválido → 400
+POST {{api}}/seguimiento
+Content-Type: application/json
+
+{ "codigo": "ABC", "apellido": "Ramírez" }
+
+################ HU-10: PANEL DEL AGENTE ################
+
+### Panel sin token → 401
+GET {{api}}/panel/solicitudes
+
+### HU-10 crit. 1: listado, las más antiguas primero
+GET {{api}}/panel/solicitudes
+Authorization: Bearer {{login.response.body.token}}
+
+### HU-10 crit. 2: filtro por estado
+GET {{api}}/panel/solicitudes?estado=RECIBIDA
+Authorization: Bearer {{login.response.body.token}}
+
+### Filtro con un estado que no existe → 400
+GET {{api}}/panel/solicitudes?estado=CUALQUIERA
+Authorization: Bearer {{login.response.body.token}}
+
+### HU-10 crit. 3 y HU-15 crit. 1: detalle con prioridades y estados posibles
+GET {{api}}/panel/solicitudes/1
+Authorization: Bearer {{login.response.body.token}}
+
+### Solicitud que no existe → 404
+GET {{api}}/panel/solicitudes/999
+Authorization: Bearer {{login.response.body.token}}
+
+################ HU-15: CAMBIOS DE ESTADO ################
+
+### Recibida → En armado → 200 (queda asignada al agente)
+PATCH {{api}}/panel/solicitudes/1/estado
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "estado": "EN_ARMADO" }
+
+### En armado → Propuesta enviada sin opciones → 409
+PATCH {{api}}/panel/solicitudes/1/estado
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "estado": "PROPUESTA_ENVIADA" }
+
+### Recibida → Propuesta enviada (saltea un paso) → 409
+PATCH {{api}}/panel/solicitudes/2/estado
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "estado": "PROPUESTA_ENVIADA" }
+
+### Recibida → Desestimada → 200
+PATCH {{api}}/panel/solicitudes/2/estado
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "estado": "DESESTIMADA" }
+
+### Desestimada → En armado (estado final) → 409
+PATCH {{api}}/panel/solicitudes/2/estado
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "estado": "EN_ARMADO" }
+
+### HU-06 crit. 2: el cliente ve el estado nuevo (esperá 1 minuto si quedó bloqueado)
+POST {{api}}/seguimiento
+Content-Type: application/json
+
+{ "codigo": "{{sofia.response.body.codigoSeguimiento}}", "apellido": "Ramírez" }
