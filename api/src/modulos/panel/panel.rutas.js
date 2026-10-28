@@ -3,6 +3,7 @@ import { validar } from '../../middlewares/validar.js';
 import { requiereAgente } from '../../middlewares/autenticacion.js';
 import { filtroSolicitudes, parametroId, esquemaCambioEstado } from './panel.esquemas.js';
 import { listarSolicitudes, obtenerSolicitud, cambiarEstado } from './panel.servicio.js';
+import { generarOpciones } from '../ensamblaje/ensamblaje.servicio.js';
 
 export const rutasPanel = Router();
 
@@ -20,8 +21,14 @@ rutasPanel.get('/solicitudes/:id', async (req, res) => {
   res.json(await obtenerSolicitud(id));
 });
 
-// HU-15: cambio de estado
+// HU-15: cambio de estado (incluye validar la propuesta)
 rutasPanel.patch('/solicitudes/:id/estado', validar(esquemaCambioEstado), async (req, res) => {
   const { id } = parametroId.parse(req.params);
   res.json(await cambiarEstado(id, req.body.estado, req.usuario.id));
+});
+
+// HU-11: armado automático de las opciones de viaje
+rutasPanel.post('/solicitudes/:id/opciones', async (req, res) => {
+  const { id } = parametroId.parse(req.params);
+  res.status(201).json(await generarOpciones(id));
 });

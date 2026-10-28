@@ -383,3 +383,96 @@ POST {{api}}/seguimiento
 Content-Type: application/json
 
 { "codigo": "{{solicitud1.response.body.codigoSeguimiento}}", "apellido": "Ramírez" }
+
+################ SESIÓN 5 ################
+# Antes: npx prisma db seed y ejecutar el login
+
+### Solicitud 1: Martín, Bariloche 7 noches, prioriza categoría (4), ritmo tranquilo (2)
+# @name martin
+POST {{api}}/solicitudes
+Content-Type: application/json
+
+{
+  "nombreCliente": "Martín",
+  "apellidoCliente": "Gómez",
+  "email": "martin.gomez@ejemplo.com",
+  "cantidadAdultos": 2,
+  "presupuestoMax": 2500,
+  "prioridadPrecioConfort": 4,
+  "prioridadRitmo": 2,
+  "consentimientoDatos": true,
+  "destinos": [
+    { "idDestino": 1, "fechaDesde": "2026-12-12", "fechaHasta": "2026-12-19" }
+  ]
+}
+
+### Solicitud 2: Lucía, dos destinos, prioriza precio (2), ritmo activo (4)
+POST {{api}}/solicitudes
+Content-Type: application/json
+
+{
+  "nombreCliente": "Lucía",
+  "apellidoCliente": "Fernández",
+  "email": "lucia@ejemplo.com",
+  "cantidadAdultos": 2,
+  "presupuestoMax": 3000,
+  "prioridadPrecioConfort": 2,
+  "prioridadRitmo": 4,
+  "consentimientoDatos": true,
+  "destinos": [
+    { "idDestino": 1, "fechaDesde": "2026-12-01", "fechaHasta": "2026-12-06" },
+    { "idDestino": 2, "fechaDesde": "2026-12-06", "fechaHasta": "2026-12-09" }
+  ]
+}
+
+### Solicitud 3: Pedro, El Calafate (sin servicios en el catálogo)
+POST {{api}}/solicitudes
+Content-Type: application/json
+
+{
+  "nombreCliente": "Pedro",
+  "apellidoCliente": "López",
+  "email": "pedro@ejemplo.com",
+  "cantidadAdultos": 2,
+  "presupuestoMax": 2000,
+  "consentimientoDatos": true,
+  "destinos": [
+    { "idDestino": 3, "fechaDesde": "2027-01-05", "fechaHasta": "2027-01-10" }
+  ]
+}
+
+### Armar opciones de una solicitud Recibida → 409
+POST {{api}}/panel/solicitudes/1/opciones
+Authorization: Bearer {{login.response.body.token}}
+
+### Pasar las tres a En armado (ejecutá este, cambiá el 1 por 2 y por 3, y ejecutalo de nuevo)
+PATCH {{api}}/panel/solicitudes/3/estado
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "estado": "EN_ARMADO" }
+
+### HU-11 crit. 1 y 2: armar las opciones de Martín
+POST {{api}}/panel/solicitudes/1/opciones
+Authorization: Bearer {{login.response.body.token}}
+
+### HU-11 con dos destinos: armar las opciones de Lucía
+POST {{api}}/panel/solicitudes/2/opciones
+Authorization: Bearer {{login.response.body.token}}
+
+### HU-11 crit. 3: destino sin servicios → 409
+POST {{api}}/panel/solicitudes/3/opciones
+Authorization: Bearer {{login.response.body.token}}
+
+### Validar la propuesta de Martín
+PATCH {{api}}/panel/solicitudes/1/estado
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{ "estado": "PROPUESTA_ENVIADA" }
+
+### HU-05 completa: Martín ve sus 3 opciones ordenadas
+POST {{api}}/seguimiento
+Content-Type: application/json
+
+{ "codigo": "{{martin.response.body.codigoSeguimiento}}", "apellido": "Gómez" }
