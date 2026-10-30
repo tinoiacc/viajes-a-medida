@@ -50,6 +50,7 @@ export async function obtenerSolicitud(id) {
     nombreCliente: s.nombreCliente,
     apellidoCliente: s.apellidoCliente,
     email: s.email,
+    comentarios: s.comentarios,
     cantidadAdultos: s.cantidadAdultos,
     cantidadMenores: s.cantidadMenores,
     presupuestoMax: aNumero(s.presupuestoMax),

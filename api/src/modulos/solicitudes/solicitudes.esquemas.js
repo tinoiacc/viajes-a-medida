@@ -38,6 +38,12 @@ export const esquemaAltaSolicitud = z.object({
     .positive({ message: 'El presupuesto debe ser mayor a cero' }),
   prioridadPrecioConfort: prioridad,
   prioridadRitmo: prioridad,
+  
+// Pedidos especiales del cliente (hotel con pileta, viaja con un bebé...)
+  comentarios: z.string().trim()
+    .max(500, { message: 'Los comentarios no pueden superar los 500 caracteres' })
+    .optional(),
+
   // Ley 25.326 y Decreto 1558/2001: consentimiento para el almacenamiento fuera del país
   consentimientoDatos: z.literal(true, {
     message: 'Debe aceptar el tratamiento de sus datos para continuar',

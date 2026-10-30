@@ -18,6 +18,7 @@ const SOLICITUD_INICIAL = {
   email: '',
   prioridadPrecioConfort: 3, // HU-02, crit. 2: valores intermedios por defecto
   prioridadRitmo: 3,
+  comentarios: '',
   consentimientoDatos: false,
 };
 
@@ -57,7 +58,7 @@ function validarPaso(paso, s) {
 function pasoDelCampo(campo) {
   if (campo.startsWith('destinos') || campo === 'presupuestoMax') return 0;
   if (['cantidadAdultos', 'cantidadMenores', 'nombreCliente', 'apellidoCliente', 'email'].includes(campo)) return 1;
-  if (campo.startsWith('prioridad')) return 2;
+  if (campo.startsWith('prioridad') || campo === 'comentarios') return 2;
   return 3;
 }
 

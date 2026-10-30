@@ -51,6 +51,8 @@ function vistaCliente(s) {
   return {
     codigoSeguimiento: s.codigoSeguimiento,
     nombreCliente: s.nombreCliente,
+    apellidoCliente: s.apellidoCliente,
+    comentarios: s.comentarios,
     estado: s.estado,
     estadoEtiqueta: ETIQUETAS[s.estado],
     fechaUltimoCambio: s.fechaUltimoCambio, // HU-06, crit. 1

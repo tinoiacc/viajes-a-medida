@@ -50,7 +50,7 @@ export function Seguimiento() {
   );
 }
 
-// HU-05 y HU-06: el estado de la solicitud y, si ya se validó, las opciones
+/// HU-05 y HU-06: el estado de la solicitud y, si ya se validó, las opciones
 function DetalleSolicitud({ solicitud, alVolver }) {
   const pasajeros =
     plural(solicitud.cantidadAdultos, 'adulto', 'adultos') +
@@ -61,6 +61,7 @@ function DetalleSolicitud({ solicitud, alVolver }) {
       <div className="cabecera-solicitud">
         <div>
           <h1>Solicitud {solicitud.codigoSeguimiento}</h1>
+          <p><strong>{solicitud.nombreCliente} {solicitud.apellidoCliente}</strong></p>
           <p className="texto-suave">
             {solicitud.destinos
               .map((d) => `${d.destino}, ${formatearFecha(d.fechaDesde)} al ${formatearFecha(d.fechaHasta)}`)
@@ -73,6 +74,13 @@ function DetalleSolicitud({ solicitud, alVolver }) {
           <p className="texto-suave">Último cambio: {formatearMomento(solicitud.fechaUltimoCambio)}</p>
         </div>
       </div>
+
+      {solicitud.comentarios && (
+        <div className="comentarios">
+          <strong>Tus comentarios</strong>
+          <p>{solicitud.comentarios}</p>
+        </div>
+      )}
 
       {/* HU-05, crit. 2: mientras la propuesta no esté validada, solo se informa el estado */}
       {solicitud.mensaje && <p className="alerta alerta-info">{solicitud.mensaje}</p>}

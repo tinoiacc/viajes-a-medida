@@ -113,8 +113,8 @@ function Deslizador({ etiqueta, izquierda, derecha, valor, alCambiar }) {
   );
 }
 
-// Paso 3: prioridades del cliente
-export function PasoPrioridades({ solicitud, cambiar }) {
+// Paso 3: prioridades del cliente y pedidos especiales
+export function PasoPrioridades({ solicitud, cambiar, errores }) {
   return (
     <>
       <h2>¿Qué te importa más?</h2>
@@ -133,6 +133,14 @@ export function PasoPrioridades({ solicitud, cambiar }) {
         valor={solicitud.prioridadRitmo}
         alCambiar={(v) => cambiar('prioridadRitmo', v)}
       />
+      <Campo
+        etiqueta="¿Algo más que tengamos que saber? (opcional)"
+        ayuda={`Por ejemplo: hotel con pileta, viajamos con un bebé. ${solicitud.comentarios.length}/500`}
+        error={errores.comentarios}
+      >
+        <textarea rows="4" maxLength={500} value={solicitud.comentarios}
+          onChange={(e) => cambiar('comentarios', e.target.value)} />
+      </Campo>
     </>
   );
 }
@@ -163,6 +171,12 @@ export function PasoConfirmacion({ solicitud, cambiar, errores, destinos }) {
         <dd>Precio y categoría: {solicitud.prioridadPrecioConfort} de 5 · Ritmo: {solicitud.prioridadRitmo} de 5</dd>
         <dt>Contacto</dt>
         <dd>{solicitud.nombreCliente} {solicitud.apellidoCliente} · {solicitud.email}</dd>
+            {solicitud.comentarios.trim() && (
+          <>
+            <dt>Comentarios</dt>
+            <dd className="texto-con-saltos">{solicitud.comentarios}</dd>
+          </>
+        )}
       </dl>
 
       <label className="casilla">

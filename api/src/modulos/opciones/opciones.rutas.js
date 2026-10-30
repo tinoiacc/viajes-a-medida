@@ -5,7 +5,7 @@ import {
   parametrosOpcion, parametrosLinea, esquemaAereo, esquemaDescarte, esquemaReemplazo, esquemaAgregado,
 } from './opciones.esquemas.js';
 import {
-  cargarAereo, descartarOpcion, listarAlternativas, reemplazarServicio, agregarServicio, quitarServicio,
+  cargarAereo, descartarOpcion, listarAlternativas, reemplazarServicio, agregarServicio, quitarServicio, listarAgregables,
 } from './opciones.servicio.js';
 
 export const rutasOpciones = Router();
@@ -27,6 +27,12 @@ rutasOpciones.patch('/:id/descartar', validar(esquemaDescarte), async (req, res)
 rutasOpciones.get('/:id/servicios/:idLinea/alternativas', async (req, res) => {
   const { id, idLinea } = parametrosLinea.parse(req.params);
   res.json(await listarAlternativas(id, idLinea));
+});
+
+// Excursiones y adicionales disponibles para agregar
+rutasOpciones.get('/:id/agregables', async (req, res) => {
+  const { id } = parametrosOpcion.parse(req.params);
+  res.json(await listarAgregables(id));
 });
 
 // HU-14, crit. 1: reemplazar un servicio

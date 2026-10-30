@@ -24,6 +24,7 @@ export async function crearSolicitud(datos) {
       nombreCliente: datos.nombreCliente,
       apellidoCliente: datos.apellidoCliente,
       email: datos.email,
+      comentarios: datos.comentarios || null,
       cantidadAdultos: datos.cantidadAdultos,
       cantidadMenores: datos.cantidadMenores,
       presupuestoMax: datos.presupuestoMax,

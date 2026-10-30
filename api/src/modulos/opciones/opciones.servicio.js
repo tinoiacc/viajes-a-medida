@@ -224,3 +224,34 @@ export async function quitarServicio(idOpcion, idLinea) {
   await recalcularOpcion(idOpcion);
   return obtenerSolicitud(opcion.idSolicitud);
 }
+// Excursiones y adicionales que se pueden sumar a la opción: de los destinos pedidos,
+// con tarifa vigente para su tramo y que la opción todavía no tenga
+export async function listarAgregables(idOpcion) {
+  const opcion = await opcionEditable(idOpcion);
+  const yaIncluidos = new Set(opcion.servicios.map((os) => os.idServicio));
+  const resultado = [];
+
+  for (const tramo of opcion.solicitud.destinos) {
+    const servicios = await prisma.servicio.findMany({
+      where: { idDestino: tramo.idDestino, tipo: { in: AGREGABLES } },
+      include: { proveedor: true, destino: true },
+      orderBy: [{ tipo: 'asc' }, { nombre: 'asc' }],
+    });
+    for (const s of servicios) {
+      if (yaIncluidos.has(s.id)) continue;
+      const tarifa = await tarifaVigente(s.id, tramo.fechaDesde, tramo.fechaHasta);
+      if (!tarifa) continue;
+      resultado.push({
+        idServicio: s.id,
+        tipo: s.tipo,
+        nombre: s.nombre,
+        destino: s.destino.nombre,
+        proveedor: s.proveedor.nombre,
+        montoNeto: Number(tarifa.montoNeto),
+        moneda: tarifa.moneda,
+        montoUSD: redondear(convertir(Number(tarifa.montoNeto), tarifa.moneda, tiposDeCambio())),
+      });
+    }
+  }
+  return resultado;
+}

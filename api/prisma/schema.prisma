@@ -113,6 +113,7 @@ model Solicitud {
   nombreCliente          String              @map("nombre_cliente") @db.VarChar(100)
   apellidoCliente        String              @map("apellido_cliente") @db.VarChar(100)
   email                  String              @db.VarChar(150)
+  comentarios            String?             @db.VarChar(500)
   cantidadAdultos        Int                 @map("cantidad_adultos")
   cantidadMenores        Int                 @default(0) @map("cantidad_menores")
   fechaIngreso           DateTime            @default(now()) @map("fecha_ingreso")
