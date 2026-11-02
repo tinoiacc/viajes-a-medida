@@ -171,7 +171,7 @@ export function PasoConfirmacion({ solicitud, cambiar, errores, destinos }) {
         <dd>Precio y categoría: {solicitud.prioridadPrecioConfort} de 5 · Ritmo: {solicitud.prioridadRitmo} de 5</dd>
         <dt>Contacto</dt>
         <dd>{solicitud.nombreCliente} {solicitud.apellidoCliente} · {solicitud.email}</dd>
-            {solicitud.comentarios.trim() && (
+        {solicitud.comentarios.trim() && (
           <>
             <dt>Comentarios</dt>
             <dd className="texto-con-saltos">{solicitud.comentarios}</dd>

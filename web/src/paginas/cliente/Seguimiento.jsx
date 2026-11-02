@@ -50,7 +50,7 @@ export function Seguimiento() {
   );
 }
 
-/// HU-05 y HU-06: el estado de la solicitud y, si ya se validó, las opciones
+// HU-05 y HU-06: el estado de la solicitud y, si ya se validó, las opciones
 function DetalleSolicitud({ solicitud, alVolver }) {
   const pasajeros =
     plural(solicitud.cantidadAdultos, 'adulto', 'adultos') +

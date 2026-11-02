@@ -34,7 +34,7 @@ async function main() {
     ],
   });
 
-  // Valores de ejemplo para la demo
+  // Ejemplo para DEMO
   const desde = new Date('2026-01-01T00:00:00Z');
   await prisma.parametroComercial.createMany({
     data: [
