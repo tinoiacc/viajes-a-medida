@@ -1,10 +1,10 @@
 :root {
-  --color-primario: #1d6a87;
-  --color-primario-oscuro: #15516a;
-  --color-primario-suave: #e3eef3;
-  --color-fondo: #f4f6f8;
+  --color-primario: #24768f;
+  --color-primario-oscuro: #1b5f74;
+  --color-primario-suave: #dcecf3;
+  --color-fondo: #edf4f7;
   --color-superficie: #ffffff;
-  --color-borde: #d7dee4;
+  --color-borde: #d6e4eb;
   --color-texto: #1f2a33;
   --color-texto-suave: #5b6873;
   --color-error: #b42318;
@@ -30,12 +30,17 @@ a { color: var(--color-primario); }
 
 /* Estructura */
 .contenedor { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
-.encabezado { background: var(--color-superficie); border-bottom: 1px solid var(--color-borde); }
+.encabezado { background: var(--color-primario); }
 .encabezado-interno { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 60px; flex-wrap: wrap; }
-.marca { font-weight: 700; font-size: 1.1rem; color: var(--color-primario); text-decoration: none; }
+.marca { font-weight: 700; font-size: 1.1rem; color: #fff; text-decoration: none; }
 .navegacion { display: flex; gap: 4px; flex-wrap: wrap; }
-.navegacion a { padding: 8px 12px; border-radius: 999px; color: var(--color-texto-suave); text-decoration: none; }
-.navegacion a.active { background: var(--color-primario-suave); color: var(--color-primario); font-weight: 600; }
+.navegacion { align-items: center; }
+.navegacion a { padding: 8px 14px; border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 999px; color: rgba(255, 255, 255, 0.9); text-decoration: none; }
+.navegacion a:hover { border-color: #fff; color: #fff; background: rgba(255, 255, 255, 0.1); }
+.navegacion a.active { background: rgba(255, 255, 255, 0.2); border-color: #fff; color: #fff; font-weight: 600; }
+/* El ingreso de agentes se distingue de las opciones del cliente */
+.navegacion a.nav-agentes { margin-left: 8px; background: #fff; border-color: #fff; color: var(--color-primario); font-weight: 600; }
+.navegacion a.nav-agentes:hover, .navegacion a.nav-agentes.active { background: var(--color-primario-suave); border-color: var(--color-primario-suave); color: var(--color-primario-oscuro); }
 .contenido { padding-top: 24px; padding-bottom: 48px; }
 .pie { text-align: center; color: var(--color-texto-suave); font-size: 0.85rem; padding: 24px 16px; }
 .tarjeta { background: var(--color-superficie); border: 1px solid var(--color-borde); border-radius: var(--radio); padding: 24px; box-shadow: var(--sombra); }
@@ -97,6 +102,18 @@ a { color: var(--color-primario); }
 /* Seguimiento */
 .formulario-consulta { max-width: 480px; margin: 0 auto; }
 .cabecera-solicitud { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+/* Avance de la solicitud: las etapas cumplidas, la actual y las que faltan */
+.estado-solicitud { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.estado-solicitud p { margin: 0; font-size: 0.85rem; }
+.linea-estados { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; list-style: none; margin: 0; padding: 0; font-size: 0.82rem; color: var(--color-texto-suave); }
+.linea-estados li { display: flex; align-items: center; gap: 6px; }
+.linea-estados li + li::before { content: ''; width: 24px; height: 2px; background: var(--color-borde); }
+.linea-estados li.hecho::before, .linea-estados li.actual::before { background: var(--color-primario); }
+.linea-estados .punto { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--color-borde); background: var(--color-superficie); }
+.linea-estados .hecho { color: var(--color-primario); }
+.linea-estados .hecho .punto { background: var(--color-primario); border-color: var(--color-primario); }
+.linea-estados .actual { color: var(--color-texto); font-weight: 600; }
+.linea-estados .actual .punto { background: var(--color-primario); border-color: var(--color-primario); box-shadow: 0 0 0 3px var(--color-primario-suave); }
 .opciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 16px 0; }
 .tarjeta-opcion { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .opcion-numero { font-size: 0.8rem; font-weight: 600; color: var(--color-primario); text-transform: uppercase; letter-spacing: 0.04em; }
@@ -110,6 +127,7 @@ a { color: var(--color-primario); }
 @media (max-width: 760px) {
   .asistente { grid-template-columns: 1fr; }
   .pasos { grid-template-columns: repeat(2, 1fr); }
+  .estado-solicitud { align-items: flex-start; }
 }
 
 /* Textos largos y comentarios */

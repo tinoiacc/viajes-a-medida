@@ -5,6 +5,13 @@ import { formatearFecha, formatearMomento, plural } from '../../lib/formato.js';
 import { Campo } from '../../componentes/Campo.jsx';
 import { TarjetaOpcion } from './TarjetaOpcion.jsx';
 
+// Las etapas por las que avanza una solicitud, en orden (mismas etiquetas que la API)
+const ETAPAS = [
+  ['RECIBIDA', 'Recibida'],
+  ['EN_ARMADO', 'En armado'],
+  ['PROPUESTA_ENVIADA', 'Propuesta enviada'],
+];
+
 // HU-04: el cliente entra con su código y su apellido
 export function Seguimiento() {
   const [parametros] = useSearchParams();
@@ -69,8 +76,8 @@ function DetalleSolicitud({ solicitud, alVolver }) {
             · {pasajeros}
           </p>
         </div>
-        <div>
-          <span className={`estado estado-${solicitud.estado}`}>{solicitud.estadoEtiqueta}</span>
+        <div className="estado-solicitud">
+          <EstadoSolicitud estado={solicitud.estado} etiqueta={solicitud.estadoEtiqueta} />
           <p className="texto-suave">Último cambio: {formatearMomento(solicitud.fechaUltimoCambio)}</p>
         </div>
       </div>
@@ -99,5 +106,24 @@ function DetalleSolicitud({ solicitud, alVolver }) {
         Consultar otra solicitud
       </button>
     </section>
+  );
+}
+
+// Muestra en qué etapa está la solicitud: las anteriores quedan marcadas como cumplidas.
+// Si el agente la desestimó, se muestra solo ese estado.
+function EstadoSolicitud({ estado, etiqueta }) {
+  if (estado === 'DESESTIMADA') return <span className="estado estado-DESESTIMADA">{etiqueta}</span>;
+
+  const actual = ETAPAS.findIndex(([clave]) => clave === estado);
+  return (
+    <ol className="linea-estados">
+      {ETAPAS.map(([clave, texto], i) => (
+        <li key={clave} className={i < actual ? 'hecho' : i === actual ? 'actual' : ''}
+          aria-current={i === actual ? 'step' : undefined}>
+          <span className="punto" />
+          {texto}
+        </li>
+      ))}
+    </ol>
   );
 }

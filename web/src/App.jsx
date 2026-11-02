@@ -13,7 +13,7 @@ export default function App() {
           <nav className="navegacion">
             <NavLink to="/solicitud">Armá tu viaje</NavLink>
             <NavLink to="/seguimiento">Consultá tu solicitud</NavLink>
-            <NavLink to="/agente">Agentes</NavLink>
+            <NavLink to="/agente" className="nav-agentes">Agentes</NavLink>
           </nav>
         </div>
       </header>
