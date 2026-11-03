@@ -4,6 +4,7 @@ import { api } from '../../lib/api.js';
 import { formatearFecha, formatearMomento, plural } from '../../lib/formato.js';
 import { Campo } from '../../componentes/Campo.jsx';
 import { TarjetaOpcion } from './TarjetaOpcion.jsx';
+import { ContactoAgencia } from './ContactoAgencia.jsx';
 
 // Las etapas por las que avanza una solicitud, en orden (mismas etiquetas que la API)
 const ETAPAS = [
@@ -59,6 +60,7 @@ export function Seguimiento() {
 
 // HU-05 y HU-06: el estado de la solicitud y, si ya se validó, las opciones
 function DetalleSolicitud({ solicitud, alVolver }) {
+  const [elegida, setElegida] = useState(null); // el número de la opción que eligió el cliente
   const pasajeros =
     plural(solicitud.cantidadAdultos, 'adulto', 'adultos') +
     (solicitud.cantidadMenores > 0 ? ` y ${plural(solicitud.cantidadMenores, 'menor', 'menores')}` : '');
@@ -94,11 +96,15 @@ function DetalleSolicitud({ solicitud, alVolver }) {
 
       {solicitud.opciones.length > 0 && (
         <>
-          <p>Estas son las opciones que armamos, ordenadas según las prioridades que nos indicaste.</p>
+          <p>Estas son las opciones que armamos, ordenadas según las prioridades que nos indicaste. Elegí la que más te guste.</p>
           <div className="opciones">
-            {solicitud.opciones.map((o) => <TarjetaOpcion key={o.orden} opcion={o} />)}
+            {solicitud.opciones.map((o) => (
+              <TarjetaOpcion key={o.orden} opcion={o}
+                elegida={elegida === o.orden} alElegir={() => setElegida(o.orden)} />
+            ))}
           </div>
           <p className="nota">Los precios son estimados y quedan sujetos a confirmación de disponibilidad.</p>
+          <ContactoAgencia solicitud={solicitud} opcion={solicitud.opciones.find((o) => o.orden === elegida)} />
         </>
       )}
 

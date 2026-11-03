@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { formatearDolares, formatearFecha, estrellas, noches, plural } from '../../lib/formato.js';
 
 // Una opción de viaje, como la Figura 13 de la tesis
-export function TarjetaOpcion({ opcion }) {
+export function TarjetaOpcion({ opcion, elegida, alElegir }) {
   const [abierta, setAbierta] = useState(false);
   const alojamientos = opcion.servicios.filter((s) => s.tipo === 'Alojamiento');
   const otros = opcion.servicios.filter((s) => s.tipo !== 'Alojamiento');
 
   return (
-    <article className="tarjeta tarjeta-opcion">
+    <article className={`tarjeta tarjeta-opcion${elegida ? ' elegida' : ''}`}>
       <span className="opcion-numero">Opción {opcion.orden}</span>
       <h3>{alojamientos.map((a) => a.nombre).join(' + ')}</h3>
       <p className="texto-suave">{alojamientos.map((a) => estrellas(a.categoria)).join(' · ')}</p>
@@ -27,9 +27,14 @@ export function TarjetaOpcion({ opcion }) {
       </p>
 
       {/* HU-05, crit. 3: los servicios que componen la opción */}
-      <button type="button" className="boton boton-secundario" onClick={() => setAbierta(!abierta)}>
-        {abierta ? 'Ocultar detalle' : 'Ver detalle'}
-      </button>
+      <div className="acciones-opcion">
+        <button type="button" className="boton boton-secundario" onClick={() => setAbierta(!abierta)}>
+          {abierta ? 'Ocultar detalle' : 'Ver detalle'}
+        </button>
+        <button type="button" className="boton" onClick={alElegir} aria-pressed={elegida}>
+          {elegida ? 'Opción elegida ✓' : 'Elegir esta opción'}
+        </button>
+      </div>
       {abierta && (
         <table className="detalle-servicios">
           <tbody>
