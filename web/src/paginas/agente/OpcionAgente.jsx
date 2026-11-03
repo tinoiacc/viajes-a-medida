@@ -169,8 +169,9 @@ export function OpcionAgente({ opcion, presupuesto, editable, ocupado, ejecutar 
         <dd>{opcion.importeAereo > 0 ? formatearDolares(opcion.importeAereo) : 'sin cargar'}</dd>
         <dt className="total">Precio final</dt><dd className="total">{formatearDolares(opcion.precioFinal)}</dd>
       </dl>
-      {opcion.precioFinal > presupuesto && (
-        <p className="alerta alerta-aviso">Supera el presupuesto del cliente ({formatearDolares(presupuesto)}).</p>
+      {/* El presupuesto del cliente no incluye el pasaje aéreo: se compara sin él */}
+      {opcion.precioFinal - opcion.importeAereo > presupuesto && (
+        <p className="alerta alerta-aviso">Sin el aéreo, supera el presupuesto del cliente ({formatearDolares(presupuesto)}).</p>
       )}
 
       {/* HU-13: importe del aéreo conseguido por fuera */}
